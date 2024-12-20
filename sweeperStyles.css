@@ -1,0 +1,23 @@
+.board {
+  width: 1000px;
+  height: 100px;
+  background-color: blue;
+  display: grid;
+  gap: 2px;
+}
+
+body {
+  background-color: antiquewhite;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  background-color: #ccc;
+  border: 1px solid #999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+}
