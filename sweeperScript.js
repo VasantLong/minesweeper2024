@@ -1,22 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
   /* 网格初步建立 */
-  const board = document.getElementById('board');
   const grid = document.getElementById('grid');
   function createBoard(rows, cols) {
     for (let r = 0; r < rows; r++) {
-      const tr = document.createElement('tr');
+      let tr = document.createElement('tr');
       grid.appendChild(tr);
       for (let c = 0; c < cols; c++) {
-        const cell = document.createElement('td');
+        let td = document.createElement('td');
+        tr.appendChild(td);
+        let cell = document.createElement('div');
         cell.className = 'cell';
         cell.dataset.row = r;
         cell.dataset.col = c;
-        tr.appendChild(cell);
+        td.append(cell);
       }
     }
   }
   createBoard(9, 9);
   console.log("createboard");
+
+  /* 随机布雷 */
+  function minePosition() {
+    let el = document.querySelector("#board > #grid");
+    console.log(el);
+
+  }
+  minePosition()
 })
 
 
