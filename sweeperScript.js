@@ -20,12 +20,32 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log("createboard");
 
   /* 随机布雷 */
-  function minePosition() {
-    let el = document.querySelector("#board > #grid");
-    console.log(el);
-
+  function minePosition(rows, cols, mines) {
+    const minePositions = [];
+    while (minePositions.length < mines) {
+      const row = Math.floor(Math.random() * rows);
+      const col = Math.floor(Math.random() * cols);
+      const position = `${row}-${col}`;
+      if (!minePositions.includes(position)) {
+        minePositions.push(position);
+      }
+    }
+    return minePositions;
   }
-  minePosition()
+  let minePositions = minePosition(9, 9, 10);
+  console.log(minePositions);
+
+  // 在网格中放置雷
+  function placeMines(minePositions) {
+    minePositions.forEach(position => {
+      const [row, col] = position.split('-');
+      const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+      cell.classList.add('mine'); // 添加雷的样式
+      cell.textContent = '💣'; // 显示雷的图标
+    });
+  }
+  placeMines(minePositions)
+  console.log("placeMines");
 })
 
 
