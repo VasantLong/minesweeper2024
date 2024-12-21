@@ -25,19 +25,25 @@ body {
   margin: auto;
   /* 水平居中*/
   /*border-collapse: collapse;合并单元格边框*/
-
-
 }
 
 .cell {
   width: 30px;
   height: 30px;
   background-color: #ccc;
-  border: 1px solid red;
+  border: 1px solid #999;
   /*999*/
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 20px;
-  cursor: pointer;
+}
+
+.cell.mine {
+  background-color: red; /* 雷的背景颜色 */
+}
+
+.cell.revealed {
+  background-color: #eee; /* 已显示的单元格背景颜色 */
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
