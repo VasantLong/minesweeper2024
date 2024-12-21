@@ -1,11 +1,14 @@
+body {
+  background-color: antiquewhite;
+}
 #board {
   background-color: #6f6f6f;
   gap: 2px;
   display: grid;
 }
 
-body {
-  background-color: antiquewhite;
+.sweeperInfo{
+  display: flex;
 }
 
 #grid {
