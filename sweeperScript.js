@@ -92,10 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleCellClick(cell) {
     const row = parseInt(cell.dataset.row);//字符串换为整数
     const col = parseInt(cell.dataset.col);
-
-    if (cell.classList.contains('revealed')) return; // 如果已经显示，跳过
-    if (cell.classList.contains('flagged')) return;// 如果单元格已经被标记为旗子，直接返回，不执行左键单击操作
-    if (cell.dataset.mine && !cell.classList.contains('flagged')) {// 如果点击的是雷，游戏结束
+    // 如果已经显示/被标记旗子，跳过
+    if (cell.classList.contains('revealed') ||
+      cell.classList.contains('flagged')) return;
+    // 如果点击的是雷，游戏结束
+    if (cell.dataset.mine &&
+      !cell.classList.contains('flagged')) {
       alert('Game Over!');
       revealAllMines();
       lockClickEvents(); // 锁定点击事件
@@ -142,7 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
 
         const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
-        if (!cell.classList.contains('revealed') && !cell.dataset.mine && !cell.classList.contains('flagged')) {
+        if (!cell.classList.contains('revealed') &&
+          !cell.dataset.mine &&
+          !cell.classList.contains('flagged')) {
           cell.classList.add('revealed');
           if (cell.dataset.mineCount === '0') {
             revealEmptyCells(r, c);
@@ -169,9 +173,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  /* M6 左键双击事件 */
+  function handleDoubleClick(cell) {
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+
+    if (cell.classList.contains('flagged')) return;
+    if (cell.classList.contains('revealed') &&
+      cell.dataset.mineCount) {
+      // 获取周围的单元格
+      if (cell.dataset.mineCount !== '0') {
+        const surroundingCells = getSurroundingCells(row, col);
+        // 检查周围标记的旗子数量是否与实际雷数匹配
+        const flaggedCount = surroundingCells.filter(cell => cell.classList.contains('flagged')).length;
+        const mineCount = parseInt(cell.dataset.mineCount);
+        if (flaggedCount === mineCount) {
+          // 如果标记的旗子数量与实际雷数匹配，清除周围未标记的单元格
+          surroundingCells.forEach(cell => {
+            if (!cell.classList.contains('flagged') &&
+              !cell.classList.contains('revealed')) {
+              handleCellClick(cell); // 调用左键单击处理函数
+            }
+          });
+        }
+
+      }
+    }
+  }
+
+  /* M6.1 获取单元格周围的单元格 后面看和M3能否合并 */
+  function getSurroundingCells(row, col) {
+    const surroundingCells = [];
+    for (let r = row - 1; r <= row + 1; r++) {
+      for (let c = col - 1; c <= col + 1; c++) {
+        if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
+        const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+        surroundingCells.push(cell);
+      }
+    }
+    return surroundingCells;
+  }
+
   cells.forEach(cell => {
     cell.addEventListener('click', () => handleCellClick(cell));
     cell.addEventListener('contextmenu', (event) => handleRightClick(event, cell));
+    cell.addEventListener('dblclick', () => handleDoubleClick(cell));
   });
 
 
