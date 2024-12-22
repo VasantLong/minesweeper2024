@@ -23,8 +23,8 @@ body {
 
 #grid {
   margin: auto;
-  /* 水平居中*/
-  /*border-collapse: collapse;合并单元格边框*/
+  /* 水平居中 合并单元格边框*/
+  border-collapse: collapse;
 }
 
 .cell {
@@ -32,7 +32,6 @@ body {
   height: 30px;
   background-color: #ccc;
   border: 1px solid #999;
-  /*999*/
   display: flex;
   justify-content: center;
   align-items: center;
@@ -42,6 +41,11 @@ body {
 .cell.mine {
   background-color: red;
   /* 雷的背景颜色 */
+}
+
+.cell.flagged {
+  color: red;
+  /* 旗子的颜色 */
 }
 
 .cell.revealed {

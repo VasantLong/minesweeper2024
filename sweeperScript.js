@@ -94,26 +94,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const col = parseInt(cell.dataset.col);
 
     if (cell.classList.contains('revealed')) return; // 如果已经显示，跳过
-    if (cell.dataset.mine) {
-      // 如果点击的是雷，游戏结束
+    if (cell.classList.contains('flagged')) return;// 如果单元格已经被标记为旗子，直接返回，不执行左键单击操作
+    if (cell.dataset.mine && !cell.classList.contains('flagged')) {// 如果点击的是雷，游戏结束
       alert('Game Over!');
       revealAllMines();
       lockClickEvents(); // 锁定点击事件
-    } else {
-      // 如果点击的不是雷，显示周围的雷数
+    } else {// 如果点击的不是雷，显示周围的雷数
       const mineCount = cell.dataset.mineCount;
       cell.textContent = mineCount > 0 ? mineCount : '';
       cell.classList.add('revealed');
-
-      // 如果周围没有雷，自动展开周围的空白区域
-      if (mineCount === '0') {
+      if (mineCount === '0') {// 如果周围没有雷，自动展开周围的空白区域
         revealEmptyCells(row, col);
       }
     }
   }
-  cells.forEach(cell => {
-    cell.addEventListener('click', () => handleCellClick(cell));
-  });
 
   /* M4.0 锁定事件  */
   function lockClickEvents() {
@@ -146,8 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let r = row - 1; r <= row + 1; r++) {
       for (let c = col - 1; c <= col + 1; c++) {
         if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
+
         const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
-        if (!cell.classList.contains('revealed') && !cell.dataset.mine) {
+        if (!cell.classList.contains('revealed') && !cell.dataset.mine && !cell.classList.contains('flagged')) {
           cell.classList.add('revealed');
           if (cell.dataset.mineCount === '0') {
             revealEmptyCells(r, c);
@@ -159,6 +154,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+
+  /* M5 右键单击事件 */
+  function handleRightClick(event, cell) {
+    event.preventDefault(); // 阻止默认的右键菜单
+    if (cell.classList.contains('revealed')) return; // 如果已经显示，跳过
+
+    if (cell.textContent === '🚩') {// 如果已经标记为旗子，取消标记
+      cell.textContent = '';
+      cell.classList.remove('flagged');
+    } else {// 标记为旗子
+      cell.textContent = '🚩';
+      cell.classList.add('flagged');
+    }
+  }
+
+  cells.forEach(cell => {
+    cell.addEventListener('click', () => handleCellClick(cell));
+    cell.addEventListener('contextmenu', (event) => handleRightClick(event, cell));
+  });
 
 
 
