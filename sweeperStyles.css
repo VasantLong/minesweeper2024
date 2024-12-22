@@ -40,10 +40,17 @@ body {
 }
 
 .cell.mine {
-  background-color: red; /* 雷的背景颜色 */
+  background-color: red;
+  /* 雷的背景颜色 */
 }
 
 .cell.revealed {
-  background-color: #eee; /* 已显示的单元格背景颜色 */
+  background-color: #eee;
+  /* 已显示的单元格背景颜色 */
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.cell.lockclick {
+  /* css禁用鼠标点击事件 */
+  pointer-events: none;
 }
