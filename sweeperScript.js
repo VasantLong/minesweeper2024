@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let remainingMines = mineNum; // 初始化未标记雷数为总雷数
 
   createBoard(gridRows, gridCols);
-  console.log("createboard");
 
   //let minePositions = minePosition(gridRows, gridCols, mineNum);
   let minePositions = ['0-4', '2-2', '7-4', '6-1', '3-6', '6-5', '8-5', '1-5', '1-3', '1-0']
@@ -128,6 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (mineCount === '0') {// 如果周围没有雷，自动展开周围的空白区域
         revealEmptyCells(row, col);
       }
+      // 检查是否胜利
+      if (checkWinCondition()) {
+        winEvent();
+      }
     }
   }
 
@@ -137,16 +140,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
       cell.classList.add('lockclick');
-    })
+    });
   }
 
   /* M4.0 胜利事件  */
-  function winEvent(cells) {////////
+  function winEvent() {
     alert('Win!');
-    cells.forEach(cell => {
-      const revealCells = document.querySelectorAll('.cell.revealed');
-      const mineCells = document.querySelectorAll('.cell.dataset.mine');
-    });
+    lockClickEvents(); // 锁定点击事件
   }
 
   /* M4.1 显示所有雷 */
@@ -194,14 +194,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cell.textContent === '🚩') {// 取消标记旗子
       cell.textContent = '';
       cell.classList.remove('flagged');
-      remainingMines++;
-    } else {// 标记为旗子
+      remainingMines = Math.min(remainingMines + 1, mineNum); // 确保不超过 mineNum
+    } else {
+      // 检查当前标记的旗子数量是否已经达到或超过 mineNum
+      const flaggedCells = document.querySelectorAll('.cell.flagged');
+      if (flaggedCells.length >= mineNum) return;// 如果已经达到或超过 mineNum，禁止标记
+      // 标记为旗子
       cell.textContent = '🚩';
       cell.classList.add('flagged');
-      remainingMines--;
+      remainingMines = Math.max(remainingMines - 1, 0); // 确保不小于 0
     }
     // 更新剩余雷数的显示
     remainingMinesDisplay.textContent = `${remainingMines}`;
+    // 检查是否胜利
+    if (checkWinCondition()) {
+      winEvent();
+    }
   }
 
   /* M6 左键双击事件 */
@@ -277,14 +285,14 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(minePositions)
 
     // 重置剩余雷数
-    let remainingMines = mineNum;
+    remainingMines = mineNum;
     remainingMinesDisplay.textContent = `${remainingMines}`;
 
     // 重置计时器
     clearInterval(timerInterval);
     startTime = null;
     isTimerRunning = false;
-    timerDisplay.textContent = '时间: 0';
+    timerDisplay.textContent = '0';
 
     // 重新绑定事件监听器
     const cells = document.querySelectorAll('.cell');
@@ -311,10 +319,26 @@ document.addEventListener('DOMContentLoaded', () => {
     startTime = Date.now(); // 记录游戏开始时间
     timerInterval = setInterval(() => {
       const currentTime = Math.floor((Date.now() - startTime) / 1000);
-      timerDisplay.textContent = `时间: ${currentTime}`;
+      timerDisplay.textContent = `${currentTime}`;
     }, 1000);
   }
 
+  /* M8 胜利条件判断 */
+  function checkWinCondition() {
+    const cells = document.querySelectorAll('.cell');
+    let allNonMineCellsRevealed = true;
+    let allMinesFlagged = true;
 
+    cells.forEach(cell => {
+      if (cell.dataset.mine === 'true' && !cell.classList.contains('flagged')) {
+        allMinesFlagged = false;
+      }
+      if (cell.dataset.mine !== 'true' && !cell.classList.contains('revealed')) {
+        allNonMineCellsRevealed = false;
+      }
+    });
+
+    return allNonMineCellsRevealed || allMinesFlagged;
+  }
 
 })
