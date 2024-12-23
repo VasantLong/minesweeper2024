@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cells = document.querySelectorAll('.cell');
   cells.forEach(cell => {
     cell.addEventListener('click',
-      () => handleCellClick(cell, minePositions));
+      () => handleCellClick(cell));
     cell.addEventListener('contextmenu',
       (event) => handleRightClick(event, cell));
     cell.addEventListener('dblclick',
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   /* M4 左键单击事件 */
-  function handleCellClick(cell, minePositions) {
+  function handleCellClick(cell) {
     if (!isTimerRunning) {
       // 如果计时器未运行，启动计时器
       startTimer();
@@ -122,10 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cell.dataset.mine &&
       !cell.classList.contains('flagged')) {
-      // 如果点击的是雷，游戏结束
-      alert('Game Over!');
-      revealAllMines(minePositions);
-      lockClickEvents(); // 锁定点击事件
+      // 如果点击的是雷，显示失败界面
+      loseEvent();
+
     } else {
       // 如果点击的不是雷，显示周围的雷数
       const mineCount = cell.dataset.mineCount;
@@ -152,32 +151,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* M4.0 胜利事件  */
+  const winMessage = document.createElement('div');
   function winEvent() {
-    const winMessage = document.createElement('div');
     winMessage.textContent = 'You Win!';
-    winMessage.style.position = 'fixed';
-    winMessage.style.top = '50%';
-    winMessage.style.left = '50%';
-    winMessage.style.transform = 'translate(-50%, -50%)';
-    winMessage.style.backgroundColor = 'green';
-    winMessage.style.color = 'white';
-    winMessage.style.padding = '20px';
-    winMessage.style.borderRadius = '10px';
+    winMessage.style.display = 'block';
+    winMessage.id = 'winMessage';
     document.body.appendChild(winMessage);
-
-    lockClickEvents(); // 锁定点击事件
+    lockClickEvents();
   }
 
   /* M4.1 显示所有雷 */
-  function revealAllMines(minePositions) {
-    console.log(minePositions)
+  function revealAllMines() {
+    if (minePositions.length === 0) {
+      console.warn('minePositions is empty. No mines to reveal.');
+      return;
+    }
     minePositions.forEach(position => {
       const [row, col] = position.split('-');
       const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
-      cell.textContent = '💣';
-      cell.classList.add('mine');
+
+      if (!cell.classList.contains('flagged')) {
+        cell.textContent = '💣';
+        cell.classList.add('mine');
+      }
     });
   }
+
+  function revealWrongFlag() {
+    cells.forEach(cell => {
+      const row = parseInt(cell.dataset.row);
+      const col = parseInt(cell.dataset.col);
+      const position = `${row}-${col}`;
+      if (!minePositions.includes(position) &&
+        cell.classList.contains('flagged')) {
+        cell.textContent = '❌'; // 显示错误标记
+        cell.classList.add('wrong-flag');
+      }
+    })
+
+  }
+
   /* M4.2 自动展开空白区域 */
   function revealEmptyCells(row, col) {
     for (let r = row - 1; r <= row + 1; r++) {
@@ -260,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
           surroundingCells.forEach(cell => {
             if (!cell.classList.contains('flagged') &&
               !cell.classList.contains('revealed')) {
-              handleCellClick(cell, minePositions); // 调用左键单击处理函数
+              handleCellClick(cell); // 调用左键单击处理函数
             }
           });
         }
@@ -319,15 +332,19 @@ document.addEventListener('DOMContentLoaded', () => {
     isFirstClick = true;
     console.log(isFirstClick)
 
+    // 隐藏失败界面
+    loseMessage.style.display = 'none';
+    winMessage.style.display = 'none';
+
     // 重新绑定事件监听器
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
       cell.addEventListener('click',
-        () => handleCellClick(cell, minePositions));
+        () => handleCellClick(cell));
       cell.addEventListener('contextmenu',
         (event) => handleRightClick(event, cell));
       cell.addEventListener('dblclick',
-        () => handleDoubleClick(cell, minePositions, isFirstClick));
+        () => handleDoubleClick(cell, minePositions));
     });
   }
 
@@ -423,6 +440,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     return minePositions;
+  }
+
+
+
+  /* M11 失败事件  */
+
+  //const resetButtonOnGameOver = document.createElement('button');
+  /*resetButtonOnGameOver.textContent = 'Play Again';
+  loseMessage.appendChild(resetButtonOnGameOver);
+  resetButtonOnGameOver.addEventListener('click', resetGame);*/
+  const loseMessage = document.createElement('div');
+  function loseEvent() {
+    loseMessage.id = 'loseMessage';
+    loseMessage.textContent = 'Game Over!';
+    loseMessage.style.display = 'block';
+    document.body.appendChild(loseMessage);
+    revealAllMines();
+    revealWrongFlag();
+    lockClickEvents();
   }
 
 })
