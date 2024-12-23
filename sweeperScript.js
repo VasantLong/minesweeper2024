@@ -1,12 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
-  /* M0 网格参数定义 */
+  /* M0 网格参数定义 
   let [gridRows, gridCols, mineNum] = [9, 9, 10];
+  let remainingMines = mineNum; // 初始化未标记雷数为总雷数*/
+  // 定义不同难度配置
+  const difficultySettings = {
+    easy: { gridRows: 9, gridCols: 9, mineNum: 10 },
+    medium: { gridRows: 16, gridCols: 16, mineNum: 40 },
+    hard: { gridRows: 16, gridCols: 30, mineNum: 99 }
+  };
+
+  // 初始难度设置为简单
+  let currentDifficulty = 'easy';
+  let [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows, difficultySettings[currentDifficulty].gridCols, difficultySettings[currentDifficulty].mineNum];
   let remainingMines = mineNum; // 初始化未标记雷数为总雷数
+
 
   createBoard(gridRows, gridCols);
 
-  //let minePositions = minePosition(gridRows, gridCols, mineNum);
-  let minePositions = ['0-4', '2-2', '7-4', '6-1', '3-6', '6-5', '8-5', '1-5', '1-3', '1-0']
+  let minePositions = minePosition(gridRows, gridCols, mineNum);
+  //let minePositions = ['0-4', '2-2', '7-4', '6-1', '3-6', '6-5', '8-5', '1-5', '1-3', '1-0']
   console.log(minePositions);
   placeMines(minePositions);
 
@@ -277,8 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 重新生成网格和雷
     createBoard(gridRows, gridCols);
-    let minePositions = ['0-1', '2-2', '7-7', '6-6', '3-3', '5-5', '8-8', '1-1', '2-2', '1-0']
-    //minePositions = minePosition(gridRows, gridCols, mineNum);
+    //let minePositions = ['0-1', '2-2', '7-7', '6-6', '3-3', '5-5', '8-8', '1-1', '2-2', '1-0']
+    minePositions = minePosition(gridRows, gridCols, mineNum);
     placeMines(minePositions);
     placeCSM(gridRows, gridCols);
     console.log(grid)
@@ -340,5 +352,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return allNonMineCellsRevealed || allMinesFlagged;
   }
+
+  /* M9 难度切换 */
+  // 获取难度选择按钮
+  const easyButton = document.getElementById('easyButton');
+  const mediumButton = document.getElementById('mediumButton');
+  const hardButton = document.getElementById('hardButton');
+
+  // 为难度选择按钮添加点击事件
+  easyButton.addEventListener('click', () => setDifficulty('easy'));
+  mediumButton.addEventListener('click', () => setDifficulty('medium'));
+  hardButton.addEventListener('click', () => setDifficulty('hard'));
+
+  // 设置难度
+  function setDifficulty(difficulty) {
+    currentDifficulty = difficulty;
+    [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows, difficultySettings[currentDifficulty].gridCols, difficultySettings[currentDifficulty].mineNum];
+    resetGame();
+  }
+
+
 
 })
