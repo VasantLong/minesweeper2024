@@ -74,8 +74,8 @@ body {
 }
 
 .cell {
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   background-color: #ccc;
   border: 1px solid #999;
   display: flex;
@@ -89,11 +89,6 @@ body {
 .cell.mine {
   background-color: red;
   /* 雷的背景颜色 */
-}
-
-.cell.flagged {
-  color: red;
-  /* 旗子的颜色 */
 }
 
 .cell.revealed {

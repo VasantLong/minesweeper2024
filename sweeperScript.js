@@ -1,34 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
-  /* M0 网格参数定义 
-  let [gridRows, gridCols, mineNum] = [9, 9, 10];
-  let remainingMines = mineNum; // 初始化未标记雷数为总雷数*/
-  // 定义不同难度配置
+
+  /* M0 难度配置(初始为简单) */
   const difficultySettings = {
     easy: { gridRows: 9, gridCols: 9, mineNum: 10 },
     medium: { gridRows: 16, gridCols: 16, mineNum: 40 },
     hard: { gridRows: 16, gridCols: 30, mineNum: 99 }
   };
 
-  // 初始难度设置为简单
   let currentDifficulty = 'easy';
-  let [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows, difficultySettings[currentDifficulty].gridCols, difficultySettings[currentDifficulty].mineNum];
-  let remainingMines = mineNum; // 初始化未标记雷数为总雷数
-
+  let [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows,
+  difficultySettings[currentDifficulty].gridCols,
+  difficultySettings[currentDifficulty].mineNum];
+  let remainingMines = mineNum;
+  let isFirstClick = true; // 记录是否是第一次点击
 
   createBoard(gridRows, gridCols);
-
-  let minePositions = minePosition(gridRows, gridCols, mineNum);
-  //let minePositions = ['0-4', '2-2', '7-4', '6-1', '3-6', '6-5', '8-5', '1-5', '1-3', '1-0']
-  console.log(minePositions);
-  placeMines(minePositions);
-
-  placeCSM(gridRows, gridCols);
+  let minePositions = []; // 初始为空
 
   const cells = document.querySelectorAll('.cell');
   cells.forEach(cell => {
-    cell.addEventListener('click', () => handleCellClick(cell, minePositions));
-    cell.addEventListener('contextmenu', (event) => handleRightClick(event, cell));
-    cell.addEventListener('dblclick', () => handleDoubleClick(cell, minePositions));
+    cell.addEventListener('click',
+      () => handleCellClick(cell, minePositions));
+    cell.addEventListener('contextmenu',
+      (event) => handleRightClick(event, cell));
+    cell.addEventListener('dblclick',
+      () => handleDoubleClick(cell, minePositions));
   });
 
 
@@ -46,30 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.className = 'cell';
         cell.dataset.row = r;
         cell.dataset.col = c;
-        //cell.dataset.mine = false;
-        //cell.dataset.mineCount = '';//有点逻辑重复 mine和mineCount有互斥关系疑似
         td.append(cell);
       }
     }
   }
 
 
-  /* M2.1 随机生成不同位置的雷*/
-  function minePosition(rows, cols, mines) {
-    const minePositions = [];
-    while (minePositions.length < mines) {
-      const row = Math.floor(Math.random() * rows);
-      const col = Math.floor(Math.random() * cols);
-      const position = `${row}-${col}`;
-      if (!minePositions.includes(position)) {
-        minePositions.push(position);
-      }
-    }
-    return minePositions;
-  }
-
-
-  /* M2.2 放置雷 */
+  /* M2.1 随机生成不同位置的雷
+     M2.2 放置雷 */
   function placeMines(minePositions) {
     minePositions.forEach(position => {
       const [mineRow, mineCol] = position.split('-');
@@ -77,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
       cell.dataset.mine = true; // 标记为雷
     });
   }
-
 
   /* M3 周边雷计数 */
   function countSurroundingMines(row, col) {
@@ -114,29 +93,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   /* M4 左键单击事件 */
-
   function handleCellClick(cell, minePositions) {
     if (!isTimerRunning) {
       // 如果计时器未运行，启动计时器
       startTimer();
-      isTimerRunning = true; // 标记计时器正在运行
+      isTimerRunning = true;
     }
-    const row = parseInt(cell.dataset.row);//字符串换为整数
+    const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
     // 如果已经显示/被标记旗子，跳过
     if (cell.classList.contains('revealed') ||
       cell.classList.contains('flagged')) return;
-    // 如果点击的是雷，游戏结束
+
+    console.log(isFirstClick, "first")
+    if (isFirstClick) {
+      // 如果是第一次点击，确保该单元格及其周围的单元格不包含地雷
+      minePositions = generateSafeMinePositions(row, col, gridRows, gridCols, mineNum);
+      placeMines(minePositions);
+      placeCSM(gridRows, gridCols);
+      isFirstClick = false; // 标记为已经进行过第一次点击
+    } else {
+      // 检查是否胜利
+      if (checkWinCondition()) {
+        console.log('click')
+        winEvent();
+      }
+    }
+
     if (cell.dataset.mine &&
       !cell.classList.contains('flagged')) {
+      // 如果点击的是雷，游戏结束
       alert('Game Over!');
       revealAllMines(minePositions);
       lockClickEvents(); // 锁定点击事件
-    } else {// 如果点击的不是雷，显示周围的雷数
+    } else {
+      // 如果点击的不是雷，显示周围的雷数
       const mineCount = cell.dataset.mineCount;
       cell.textContent = mineCount > 0 ? mineCount : '';
       cell.classList.add('revealed');
-      if (mineCount === '0') {// 如果周围没有雷，自动展开周围的空白区域
+      if (mineCount === '0') {
+        // 如果周围没有雷，自动展开周围的空白区域
         revealEmptyCells(row, col);
       }
       // 检查是否胜利
@@ -157,7 +153,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* M4.0 胜利事件  */
   function winEvent() {
-    alert('Win!');
+    const winMessage = document.createElement('div');
+    winMessage.textContent = 'You Win!';
+    winMessage.style.position = 'fixed';
+    winMessage.style.top = '50%';
+    winMessage.style.left = '50%';
+    winMessage.style.transform = 'translate(-50%, -50%)';
+    winMessage.style.backgroundColor = 'green';
+    winMessage.style.color = 'white';
+    winMessage.style.padding = '20px';
+    winMessage.style.borderRadius = '10px';
+    document.body.appendChild(winMessage);
+
     lockClickEvents(); // 锁定点击事件
   }
 
@@ -184,9 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
           cell.classList.add('revealed');
           if (cell.dataset.mineCount === '0') {
             revealEmptyCells(r, c);
-          }
-          if (cell.dataset.mineCount !== '0') {
+          } else {
             cell.textContent = cell.dataset.mineCount;
+          }
+          // 检查是否胜利
+          if (checkWinCondition()) {
+            winEvent();
           }
         }
       }
@@ -198,28 +208,35 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isTimerRunning) {
       // 如果计时器未运行，启动计时器
       startTimer();
-      isTimerRunning = true; // 标记计时器正在运行
+      isTimerRunning = true;
     }
     event.preventDefault(); // 阻止默认的右键菜单
     if (cell.classList.contains('revealed')) return; // 如果已经显示，跳过
 
-    if (cell.textContent === '🚩') {// 取消标记旗子
-      cell.textContent = '';
+    // 状态切换逻辑：旗子 🚩 -> 问号 ❓︎ -> 取消标记 -> 旗子 🚩
+    if (cell.textContent === '🚩') {
+      cell.textContent = '❓︎';
       cell.classList.remove('flagged');
-      remainingMines = Math.min(remainingMines + 1, mineNum); // 确保不超过 mineNum
-    } else {
-      // 检查当前标记的旗子数量是否已经达到或超过 mineNum
+      cell.classList.add('question');
+      remainingMines = Math.min(remainingMines + 1, mineNum); // 增加剩余雷数
+    } else if (cell.textContent === '❓︎') {
+      cell.textContent = '';
+      cell.classList.remove('question');
+    } else if (cell.textContent === '') {
+      // 检查旗子数量是否已经达到或超过 mineNum，如果已经达到或超过 mineNum，禁止标记
       const flaggedCells = document.querySelectorAll('.cell.flagged');
-      if (flaggedCells.length >= mineNum) return;// 如果已经达到或超过 mineNum，禁止标记
-      // 标记为旗子
+      if (flaggedCells.length >= mineNum) return;
       cell.textContent = '🚩';
       cell.classList.add('flagged');
-      remainingMines = Math.max(remainingMines - 1, 0); // 确保不小于 0
+      remainingMines = Math.max(remainingMines - 1, 0); // 减少剩余雷数
     }
+
     // 更新剩余雷数的显示
     remainingMinesDisplay.textContent = `${remainingMines}`;
     // 检查是否胜利
-    if (checkWinCondition()) {
+    if (checkWinCondition() &&
+      !isFirstClick) {
+      console.log('right')
       winEvent();
     }
   }
@@ -278,25 +295,17 @@ document.addEventListener('DOMContentLoaded', () => {
   resetButton.id = 'resetButton';
   resetButton.textContent = 'RESET';
   document.querySelector('.sweeperInfo').appendChild(resetButton);
-
   // 添加重置按钮的点击事件
   resetButton.addEventListener('click', resetGame);
 
   /* M7.2重置游戏 */
   function resetGame() {
-    // 清空网格
+    // 重置网格
     grid.innerHTML = '';
-
-    // 重新生成网格和雷
     createBoard(gridRows, gridCols);
-    //let minePositions = ['0-1', '2-2', '7-7', '6-6', '3-3', '5-5', '8-8', '1-1', '2-2', '1-0']
-    minePositions = minePosition(gridRows, gridCols, mineNum);
-    placeMines(minePositions);
-    placeCSM(gridRows, gridCols);
-    console.log(grid)
-    console.log(minePositions)
 
-    // 重置剩余雷数
+    // 重置雷、剩余雷数
+    minePositions = [];
     remainingMines = mineNum;
     remainingMinesDisplay.textContent = `${remainingMines}`;
 
@@ -306,12 +315,19 @@ document.addEventListener('DOMContentLoaded', () => {
     isTimerRunning = false;
     timerDisplay.textContent = '0';
 
+    // 重置第一次点击标志
+    isFirstClick = true;
+    console.log(isFirstClick)
+
     // 重新绑定事件监听器
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
-      cell.addEventListener('click', () => handleCellClick(cell, minePositions));
-      cell.addEventListener('contextmenu', (event) => handleRightClick(event, cell));
-      cell.addEventListener('dblclick', () => handleDoubleClick(cell, minePositions));
+      cell.addEventListener('click',
+        () => handleCellClick(cell, minePositions));
+      cell.addEventListener('contextmenu',
+        (event) => handleRightClick(event, cell));
+      cell.addEventListener('dblclick',
+        () => handleDoubleClick(cell, minePositions, isFirstClick));
     });
   }
 
@@ -335,21 +351,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 
-  /* M8 胜利条件判断 */
+  /* M8 胜利条件判断 
+      1.全部雷被标记为旗子
+      2.非雷单元格全部被揭开*/
   function checkWinCondition() {
     const cells = document.querySelectorAll('.cell');
     let allNonMineCellsRevealed = true;
     let allMinesFlagged = true;
 
     cells.forEach(cell => {
-      if (cell.dataset.mine === 'true' && !cell.classList.contains('flagged')) {
-        allMinesFlagged = false;
-      }
-      if (cell.dataset.mine !== 'true' && !cell.classList.contains('revealed')) {
-        allNonMineCellsRevealed = false;
+      if (cell.dataset.mine === 'true') {
+        if (!cell.classList.contains('flagged')) {
+          allMinesFlagged = false;
+        }
+      } else {
+        // 如果单元格不是雷，并且没有被揭开，则未胜利
+        if (!cell.classList.contains('revealed')) {
+          allNonMineCellsRevealed = false;
+        }
       }
     });
-
+    console.log(allNonMineCellsRevealed, "click")
+    console.log(allMinesFlagged, "flag")
     return allNonMineCellsRevealed || allMinesFlagged;
   }
 
@@ -360,17 +383,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const hardButton = document.getElementById('hardButton');
 
   // 为难度选择按钮添加点击事件
-  easyButton.addEventListener('click', () => setDifficulty('easy'));
-  mediumButton.addEventListener('click', () => setDifficulty('medium'));
-  hardButton.addEventListener('click', () => setDifficulty('hard'));
+  easyButton.addEventListener('click',
+    () => setDifficulty('easy'));
+  mediumButton.addEventListener('click',
+    () => setDifficulty('medium'));
+  hardButton.addEventListener('click',
+    () => setDifficulty('hard'));
 
   // 设置难度
   function setDifficulty(difficulty) {
     currentDifficulty = difficulty;
-    [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows, difficultySettings[currentDifficulty].gridCols, difficultySettings[currentDifficulty].mineNum];
+    [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows,
+    difficultySettings[currentDifficulty].gridCols,
+    difficultySettings[currentDifficulty].mineNum];
     resetGame();
   }
 
+  /* M10 第一次点击不触雷*/
+  function generateSafeMinePositions(clickedRow, clickedCol, gridRows, gridCols, mineNum) {
+    const safePositions = [];
+    // 将第一次点击的单元格及其周围的单元格标记为安全区域
+    for (let r = clickedRow - 1; r <= clickedRow + 1; r++) {
+      for (let c = clickedCol - 1; c <= clickedCol + 1; c++) {
+        if (r >= 0 && r < gridRows && c >= 0 && c < gridCols) {
+          safePositions.push(`${r}-${c}`);
+        }
+      }
+    }
+    // 生成地雷位置，确保不包含安全区域
+    const minePositions = [];
+    while (minePositions.length < mineNum) {
+      const row = Math.floor(Math.random() * gridRows);
+      const col = Math.floor(Math.random() * gridCols);
+      const position = `${row}-${col}`;
+      if (!minePositions.includes(position) &&
+        !safePositions.includes(position)) {
+        minePositions.push(position);
+      }
+    }
 
+    return minePositions;
+  }
 
 })
