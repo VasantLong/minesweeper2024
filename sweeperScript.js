@@ -55,7 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function placeMines(minePositions) {
     minePositions.forEach(position => {
       const [mineRow, mineCol] = position.split('-');
-      const cell = document.querySelector(`.cell[data-row='${mineRow}'][data-col='${mineCol}']`);
+      const cell = document.querySelector(
+        `.cell[data-row='${mineRow}'][data-col='${mineCol}']`);
       cell.dataset.mine = true; // 标记为雷
     });
   }
@@ -67,11 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let c = col - 1; c <= col + 1; c++) {
         if (r === row && c === col) continue; // 跳过当前单元格
         if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
-        const surroundingCell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+        const surroundingCell = document.querySelector(
+          `.cell[data-row='${r}'][data-col='${c}']`);
         if (surroundingCell.dataset.mine) {
           count++;
         }
-
       }
     }
     return count;
@@ -81,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function placeCSM(gridRows, gridCols) {
     for (let r = 0; r < gridRows; r++) {
       for (let c = 0; c < gridCols; c++) {
-        const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
-        //console.log(cell)
+        const cell = document.querySelector(
+          `.cell[data-row='${r}'][data-col='${c}']`);
         if (!cell.dataset.mine) {
           const mineCount = countSurroundingMines(r, c);
           if (mineCount >= 0) {
@@ -108,17 +109,16 @@ document.addEventListener('DOMContentLoaded', () => {
       cell.classList.contains('flagged') ||
       cell.classList.contains('question')) return;
 
-    console.log(isFirstClick, "first")
     if (isFirstClick) {
       // 如果是第一次点击，确保该单元格及其周围的单元格不包含地雷
-      minePositions = generateSafeMinePositions(row, col, gridRows, gridCols, mineNum);
+      minePositions = generateSafeMinePositions(row, col,
+         gridRows, gridCols, mineNum);
       placeMines(minePositions);
       placeCSM(gridRows, gridCols);
       isFirstClick = false; // 标记为已经进行过第一次点击
     } else {
       // 检查是否胜利
       if (checkWinCondition()) {
-        console.log('click')
         winEvent();
       }
     }
@@ -147,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
   /* M4.0 锁定事件  */
   function lockClickEvents() {
     clearInterval(timerInterval); // 停止计时器
-    //const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
       cell.classList.add('lockclick');
     });
@@ -171,7 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     minePositions.forEach(position => {
       const [row, col] = position.split('-');
-      const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+      const cell = document.querySelector(
+        `.cell[data-row='${row}'][data-col='${col}']`);
 
       if (!cell.classList.contains('flagged')) {
         cell.textContent = '💣';
@@ -201,7 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (r < 0 || r >= gridRows ||
           c < 0 || c >= gridCols) continue; // 跳过越界的单元格
 
-        const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+        const cell = document.querySelector(
+          `.cell[data-row='${r}'][data-col='${c}']`);
         if (!cell.classList.contains('revealed') &&
           !cell.dataset.mine &&
           !cell.classList.contains('flagged')) {
@@ -253,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 检查是否胜利
     if (checkWinCondition() &&
       !isFirstClick) {
-      console.log('right')
       winEvent();
     }
   }
@@ -294,7 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let c = col - 1; c <= col + 1; c++) {
         if (r < 0 || r >= gridRows ||
           c < 0 || c >= gridCols) continue;
-        const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+        const cell = document.querySelector(
+          `.cell[data-row='${r}'][data-col='${c}']`);
         surroundingCells.push(cell);
       }
     }
@@ -336,7 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 重置第一次点击标志
     isFirstClick = true;
-    console.log(isFirstClick)
 
     // 隐藏失败界面
     loseMessage.style.display = 'none';
@@ -394,8 +394,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    console.log(allNonMineCellsRevealed, "click")
-    console.log(allMinesFlagged, "flag")
     return allNonMineCellsRevealed || allMinesFlagged;
   }
 
@@ -462,7 +460,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loseMessage.appendChild(viewBoardButton);
 
     viewBoardButton.addEventListener('click', () => {
-      console.log("view")
       loseMessage.style.display = 'none';
       revealUnflaggedMines();
       revealWrongFlags();
@@ -482,7 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.classList.contains('flagged') ||
         cell.classList.contains('wrong-flag')) return;
       else {
-        console.log(cell);
         cell.textContent = mineCount > 0 ? mineCount : '';
         cell.classList.add('revealed');
       }
