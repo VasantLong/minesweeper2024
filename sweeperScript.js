@@ -188,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!minePositions.includes(position) &&
         cell.classList.contains('flagged')) {
         cell.textContent = '❌'; // 显示错误标记
+        cell.classList.remove('flagged')
         cell.classList.add('wrong-flag');
       }
     })
