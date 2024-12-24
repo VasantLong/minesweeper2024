@@ -5,6 +5,7 @@
 **Web单页应用开发实践项目**
 
 项目目标：采用HTML、CSS和JavaScript开发“扫雷”游戏的单页面应用。
+[在线试玩](https://vasantlong.github.io/minesweeper2024/sweeper.html)
 
 #### 里程碑 Milestone
 
