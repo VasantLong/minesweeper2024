@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFirstClick) {
       // 如果是第一次点击，确保该单元格及其周围的单元格不包含地雷
       minePositions = generateSafeMinePositions(row, col,
-         gridRows, gridCols, mineNum);
+        gridRows, gridCols, mineNum);
       placeMines(minePositions);
       placeCSM(gridRows, gridCols);
       isFirstClick = false; // 标记为已经进行过第一次点击
@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 检查是否胜利
       if (checkWinCondition()) {
         winEvent();
+        lockClickEvents()
       }
     }
 
@@ -140,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 检查是否胜利
       if (checkWinCondition()) {
         winEvent();
+        lockClickEvents()
       }
     }
   }
@@ -216,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // 检查是否胜利
           if (checkWinCondition()) {
             winEvent();
+            lockClickEvents()
           }
         }
       }
@@ -256,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkWinCondition() &&
       !isFirstClick) {
       winEvent();
+      lockClickEvents()
     }
   }
 
@@ -467,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
       revealAllCells();
     });
     lockClickEvents();
+    revealWrongFlags()
   }
 
 
