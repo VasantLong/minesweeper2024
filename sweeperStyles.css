@@ -11,6 +11,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  user-select: none;
+  /* 禁用文本选择 */
 }
 
 #difficultyButtons {
@@ -88,29 +90,21 @@ body {
   justify-content: center;
   align-items: center;
   font-size: 20px;
-  user-select: none;
-  /* 禁用文本选择 */
+
 }
 
 .cell.mine {
   background-color: red;
-  /* 雷的背景颜色 */
-  color: white;
-  /* 雷的文字颜色 */
   font-size: 1.2em;
-  /* 雷的图标大小 */
 }
 
 .cell.wrong-flag {
   background-color: orange;
-  /* 错误标记的背景颜色 */
   font-size: 1.2em;
-  /* 错误标记的图标大小 */
 }
 
 .cell.revealed {
   background-color: #eee;
-  /* 已显示的单元格背景颜色 */
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
@@ -129,6 +123,7 @@ body {
   border-radius: 10px;
   text-align: center;
   font-size: 24px;
+  z-index: 1000;
 }
 
 #loseMessage {
@@ -146,7 +141,7 @@ body {
   /* 确保在最上层 */
 }
 
-#loseMessage button {
+#loseMessage button.viewBoard {
   margin-top: 20px;
   padding: 10px 20px;
   font-size: 18px;
@@ -157,6 +152,6 @@ body {
   border-radius: 5px;
 }
 
-#loseMessage button:hover {
+#loseMessage button.viewBoard:hover {
   background-color: #ddd;
 }

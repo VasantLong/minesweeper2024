@@ -1,16 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* M0 难度配置(初始为简单) */
-  const difficultySettings = {
+  const modeSettings = {
     easy: { gridRows: 9, gridCols: 9, mineNum: 10 },
     medium: { gridRows: 16, gridCols: 16, mineNum: 40 },
     hard: { gridRows: 16, gridCols: 30, mineNum: 99 }
   };
 
-  let currentDifficulty = 'easy';
-  let [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows,
-  difficultySettings[currentDifficulty].gridCols,
-  difficultySettings[currentDifficulty].mineNum];
+  let currentMode = 'easy';
+  let [gridRows, gridCols, mineNum] =
+    [modeSettings[currentMode].gridRows,
+    modeSettings[currentMode].gridCols,
+    modeSettings[currentMode].mineNum];
   let remainingMines = mineNum;
   let isFirstClick = true; // 记录是否是第一次点击
 
@@ -103,7 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const col = parseInt(cell.dataset.col);
     // 如果已经显示/被标记旗子，跳过
     if (cell.classList.contains('revealed') ||
-      cell.classList.contains('flagged')) return;
+      cell.classList.contains('flagged') ||
+      cell.classList.contains('question')) return;
 
     console.log(isFirstClick, "first")
     if (isFirstClick) {
@@ -144,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* M4.0 锁定事件  */
   function lockClickEvents() {
     clearInterval(timerInterval); // 停止计时器
-    const cells = document.querySelectorAll('.cell');
+    //const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
       cell.classList.add('lockclick');
     });
@@ -161,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* M4.1 显示所有雷 */
-  function revealAllMines() {
+  function revealUnflaggedMines() {
     if (minePositions.length === 0) {
       console.warn('minePositions is empty. No mines to reveal.');
       return;
@@ -177,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function revealWrongFlag() {
+  function revealWrongFlags() {
     cells.forEach(cell => {
       const row = parseInt(cell.dataset.row);
       const col = parseInt(cell.dataset.col);
@@ -195,7 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function revealEmptyCells(row, col) {
     for (let r = row - 1; r <= row + 1; r++) {
       for (let c = col - 1; c <= col + 1; c++) {
-        if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
+        if (r < 0 || r >= gridRows ||
+          c < 0 || c >= gridCols) continue; // 跳过越界的单元格
 
         const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
         if (!cell.classList.contains('revealed') &&
@@ -236,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cell.textContent = '';
       cell.classList.remove('question');
     } else if (cell.textContent === '') {
-      // 检查旗子数量是否已经达到或超过 mineNum，如果已经达到或超过 mineNum，禁止标记
+      // 旗子数量如果已经达到或超过 mineNum，禁止标记
       const flaggedCells = document.querySelectorAll('.cell.flagged');
       if (flaggedCells.length >= mineNum) return;
       cell.textContent = '🚩';
@@ -266,7 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cell.dataset.mineCount !== '0') {
         const surroundingCells = getSurroundingCells(row, col);
         // 检查周围标记的旗子数量是否与实际雷数匹配
-        const flaggedCount = surroundingCells.filter(cell => cell.classList.contains('flagged')).length;
+        const flaggedCount = surroundingCells.filter(cell =>
+          cell.classList.contains('flagged')).length;
         const mineCount = parseInt(cell.dataset.mineCount);
         if (flaggedCount === mineCount) {
           // 如果标记的旗子数量与实际雷数匹配，清除周围未标记的单元格
@@ -287,7 +291,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const surroundingCells = [];
     for (let r = row - 1; r <= row + 1; r++) {
       for (let c = col - 1; c <= col + 1; c++) {
-        if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
+        if (r < 0 || r >= gridRows ||
+          c < 0 || c >= gridCols) continue;
         const cell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
         surroundingCells.push(cell);
       }
@@ -394,30 +399,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* M9 难度切换 */
-  // 获取难度选择按钮
   const easyButton = document.getElementById('easyButton');
   const mediumButton = document.getElementById('mediumButton');
   const hardButton = document.getElementById('hardButton');
-
-  // 为难度选择按钮添加点击事件
   easyButton.addEventListener('click',
-    () => setDifficulty('easy'));
+    () => setMode('easy'));
   mediumButton.addEventListener('click',
-    () => setDifficulty('medium'));
+    () => setMode('medium'));
   hardButton.addEventListener('click',
-    () => setDifficulty('hard'));
+    () => setMode('hard'));
 
-  // 设置难度
-  function setDifficulty(difficulty) {
-    currentDifficulty = difficulty;
-    [gridRows, gridCols, mineNum] = [difficultySettings[currentDifficulty].gridRows,
-    difficultySettings[currentDifficulty].gridCols,
-    difficultySettings[currentDifficulty].mineNum];
+  /* M9.1 设置难度 */
+  function setMode(mode) {
+    currentMode = mode;
+    [gridRows, gridCols, mineNum] =
+      [modeSettings[currentMode].gridRows,
+      modeSettings[currentMode].gridCols,
+      modeSettings[currentMode].mineNum];
     resetGame();
   }
 
   /* M10 第一次点击不触雷*/
-  function generateSafeMinePositions(clickedRow, clickedCol, gridRows, gridCols, mineNum) {
+  function generateSafeMinePositions
+    (clickedRow, clickedCol, gridRows, gridCols, mineNum) {
     const safePositions = [];
     // 将第一次点击的单元格及其周围的单元格标记为安全区域
     for (let r = clickedRow - 1; r <= clickedRow + 1; r++) {
@@ -445,20 +449,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   /* M11 失败事件  */
-
-  //const resetButtonOnGameOver = document.createElement('button');
-  /*resetButtonOnGameOver.textContent = 'Play Again';
-  loseMessage.appendChild(resetButtonOnGameOver);
-  resetButtonOnGameOver.addEventListener('click', resetGame);*/
   const loseMessage = document.createElement('div');
+  const viewBoardButton = document.createElement('button');
   function loseEvent() {
     loseMessage.id = 'loseMessage';
     loseMessage.textContent = 'Game Over!';
     loseMessage.style.display = 'block';
     document.body.appendChild(loseMessage);
-    revealAllMines();
-    revealWrongFlag();
+    viewBoardButton.textContent = 'View Board';
+    viewBoardButton.className = 'viewBoard';
+    loseMessage.appendChild(viewBoardButton);
+
+    viewBoardButton.addEventListener('click', () => {
+      console.log("view")
+      loseMessage.style.display = 'none';
+      revealUnflaggedMines();
+      revealWrongFlags();
+      revealAllCells();
+    });
     lockClickEvents();
+  }
+
+
+  /* M11.1 显示所有单元格状态 */
+  function revealAllCells() {
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+      const mineCount = parseInt(cell.dataset.mineCount);
+      if (cell.classList.contains('revealed') ||
+        cell.classList.contains('mine') ||
+        cell.classList.contains('flagged') ||
+        cell.classList.contains('wrong-flag')) return;
+      else {
+        console.log(cell);
+        cell.textContent = mineCount > 0 ? mineCount : '';
+        cell.classList.add('revealed');
+      }
+    });
   }
 
 })
