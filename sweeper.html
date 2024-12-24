@@ -6,19 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>扫雷游戏</title>
   <link rel="stylesheet" href="sweeperStyles.css">
-  <!--js脚本放在头部，利用onload将界面定义写在后面-->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <script src="sweeperScript.js"></script>
 </head>
 
 <body>
-  <div id="difficultyButtons">
+  <div id="heading">
+    <b>Minesweeper</b>
+  </div>
+  <div id="modeButtons">
     <button id="easyButton">Primary</button>
     <button id="mediumButton">Medium</button>
     <button id="hardButton">Expert</button>
   </div>
   <div id="board">
-    <div class="sweeperInfo"></div>
-    <table id="grid"></table>
+    <div class="sweeperInfo pad"></div>
+    <table id="grid" class="pad"></table>
   </div>
 
 </body>

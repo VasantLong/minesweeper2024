@@ -15,15 +15,22 @@ body {
   /* 禁用文本选择 */
 }
 
-#difficultyButtons {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+#heading {
+  margin-bottom: 10px;
+  font-size: x-large;
 }
 
-#difficultyButtons button {
+#modeButtons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#modeButtons button {
+  font-family: 'Nunito', sans-serif;
+  font-weight: bold;
   margin: 0 10px;
-  padding: 10px 20px;
+  padding: 2.5px 15px;
   font-size: 16px;
   background-color: #007bff;
   color: white;
@@ -32,34 +39,76 @@ body {
   cursor: pointer;
 }
 
-#difficultyButtons button:hover {
+#modeButtons button:hover {
   background-color: #0056b3;
 }
 
 
 #board {
-  background-color: #6f6f6f;
+  background-color: #ccc;
+  padding: 9px;
+  margin-top: 0.6rem;
+  border-radius: 5px;
+}
+
+.pad {
+  border: 2px solid #808080;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
 }
 
 .sweeperInfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: Arial, sans-serif;
+  height: 34px;
+  font-size: 18px;
+  padding: 10px;
+  /* 增加内边距，使整体布局更美观 */
+  background-color: #444;
+  /* 深色背景 */
+  border-radius: 5px;
+  /* 圆角 */
   margin-bottom: 10px;
-  font-family: 'Arial', sans-serif;
+  /* 与游戏面板的间距 */
 }
 
-#remainingMines,
-#timer {
-  width: 20px;
-  height: 20px;
+@font-face {
+  font-family: 'DSEG7Modern';
+  src: url('DSEG7Modern-Bold.woff2') format('woff2'),
+    url('DSEG7Modern-Bold.woff') format('woff'),
+    url('DSEG7Modern-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+#timer,
+#remainingMines {
+  font-family: 'DSEG7Modern', sans-serif;
+  font-size: 20px;
+  color: white;
+  background-color: #333;
+  border-radius: 5px;
+  border: 2px solid #666;
+  padding: 5px 10px;
+  /* 增加内边距 */
+  width: 40px;
+  text-align: right;
 }
 
 #resetButton {
-  font-size: 18px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   margin: 0 10px;
-  width: 80px;
-  height: 30px;
+  /* 增加左右间距 */
+  width: 70px;
+  height: 25px;
+  padding: 2.5px 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 #resetButton {
@@ -76,7 +125,7 @@ body {
 }
 
 #grid {
-  margin: auto;
+  margin-top: 6px;
   /* 水平居中 合并单元格边框*/
   border-collapse: collapse;
 }
@@ -84,28 +133,69 @@ body {
 .cell {
   width: 25px;
   height: 25px;
-  background-color: #ccc;
-  border: 1px solid #999;
+  background-color: #b0b0b0;
+  border: 1px solid #444;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
-
+  font-size: 23px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  /* 添加阴影，模拟立体效果 */
+  transform: translateY(-2px);
+  /* 稍微向上移动，模拟凸起效果 */
+  transition: all 0.2s ease;
+  /* 添加过渡效果，使变化平滑 */
 }
 
 .cell.mine {
   background-color: red;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 
 .cell.wrong-flag {
   background-color: orange;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 
 .cell.revealed {
-  background-color: #eee;
+  background-color: #d0d0d0;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  box-shadow: none;
+  /* 移除阴影，变为平面效果 */
+  transform: translateY(0);
+  /* 恢复到原始位置 */
+}
+
+.cell.revealed[data-mine-count="1"] {
+  color: blue;
+}
+
+.cell.revealed[data-mine-count="2"] {
+  color: green;
+}
+
+.cell.revealed[data-mine-count="3"] {
+  color: red;
+}
+
+.cell.revealed[data-mine-count="4"] {
+  color: darkblue;
+}
+
+.cell.revealed[data-mine-count="5"] {
+  color: darkred;
+}
+
+.cell.revealed[data-mine-count="6"] {
+  color: teal;
+}
+
+.cell.revealed[data-mine-count="7"] {
+  color: black;
+}
+
+.cell.revealed[data-mine-count="8"] {
+  color: gray;
 }
 
 .cell.lockclick {

@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.appendChild(tr);
       for (let c = 0; c < cols; c++) {
         let td = document.createElement('td');
+        td.style.padding = '0.5px';
         tr.appendChild(td);
         let cell = document.createElement('div');
         cell.className = 'cell';
@@ -248,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 更新剩余雷数的显示
-    remainingMinesDisplay.textContent = `${remainingMines}`;
+    remainingMinesDisplay.textContent = formatNumber(remainingMines);
     // 检查是否胜利
     if (checkWinCondition() &&
       !isFirstClick) {
@@ -306,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* M7.1 创建显示未标记雷数的元素 */
   const remainingMinesDisplay = document.createElement('div');
   remainingMinesDisplay.id = 'remainingMines';
-  remainingMinesDisplay.textContent = `${remainingMines}`;
+  remainingMinesDisplay.textContent = formatNumber(remainingMines);
   document.querySelector('.sweeperInfo').appendChild(remainingMinesDisplay);
   /* M7.2 创建重置按钮 */
   const resetButton = document.createElement('button');
@@ -325,13 +326,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 重置雷、剩余雷数
     minePositions = [];
     remainingMines = mineNum;
-    remainingMinesDisplay.textContent = `${remainingMines}`;
+    remainingMinesDisplay.textContent = formatNumber(remainingMines);
 
     // 重置计时器
     clearInterval(timerInterval);
     startTime = null;
     isTimerRunning = false;
-    timerDisplay.textContent = '0';
+    timerDisplay.textContent = '000';
 
     // 重置第一次点击标志
     isFirstClick = true;
@@ -361,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 创建计时器显示元素
   const timerDisplay = document.createElement('div');
   timerDisplay.id = 'timer';
-  timerDisplay.textContent = '0';
+  timerDisplay.textContent = '000';
   document.querySelector('.sweeperInfo').appendChild(timerDisplay);
 
   // 启动计时器
@@ -369,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startTime = Date.now(); // 记录游戏开始时间
     timerInterval = setInterval(() => {
       const currentTime = Math.floor((Date.now() - startTime) / 1000);
-      timerDisplay.textContent = `${currentTime}`;
+      timerDisplay.textContent = formatNumber(currentTime);
     }, 1000);
   }
 
@@ -487,5 +488,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  /* M12 优化界面*/
+  /* M12.1 数字格式化*/
+  function formatNumber(num) {
+    return num.toString().padStart(3, '0');
+  }
+
+
 
 })
