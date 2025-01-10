@@ -150,11 +150,15 @@ body {
 .cell.mine {
   background-color: red;
   font-size: 1.1em;
+  box-shadow: none;
+  transform: translateY(0);
 }
 
 .cell.wrong-flag {
   background-color: orange;
   font-size: 1.1em;
+  box-shadow: none;
+  transform: translateY(0);
 }
 
 .cell.revealed {

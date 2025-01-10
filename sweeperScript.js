@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* M1 网格初步建立 */
   function createBoard(rows, cols) {
+    const grid = document.getElementById('grid');  // 显式获取元素
     for (let r = 0; r < rows; r++) {
       let tr = document.createElement('tr');
       grid.appendChild(tr);
@@ -117,38 +118,35 @@ document.addEventListener('DOMContentLoaded', () => {
       placeCSM(gridRows, gridCols);
       isFirstClick = false; // 标记为已经进行过第一次点击
     } else {
-      // 检查是否胜利
-      if (checkWinCondition()) {
-        winEvent();
-        lockClickEvents()
-      }
-    }
+      if (cell.dataset.mine &&
+        !cell.classList.contains('flagged') &&
+        !cell.classList.contains('lockclick')) {
+        // 如果点击的是雷，显示失败界面
+        loseEvent();
 
-    if (cell.dataset.mine &&
-      !cell.classList.contains('flagged')) {
-      // 如果点击的是雷，显示失败界面
-      loseEvent();
+      } else {
+        // 如果点击的不是雷，显示周围的雷数
+        const mineCount = cell.dataset.mineCount;
+        cell.textContent = mineCount > 0 ? mineCount : '';
+        cell.classList.add('revealed');
+        if (mineCount === '0') {
+          // 如果周围没有雷，自动展开周围的空白区域
+          revealEmptyCells(row, col);
+        }
+        // 检查是否胜利
+        if (checkWinCondition()) {
+          winEvent();
+        }
+      }
 
-    } else {
-      // 如果点击的不是雷，显示周围的雷数
-      const mineCount = cell.dataset.mineCount;
-      cell.textContent = mineCount > 0 ? mineCount : '';
-      cell.classList.add('revealed');
-      if (mineCount === '0') {
-        // 如果周围没有雷，自动展开周围的空白区域
-        revealEmptyCells(row, col);
-      }
-      // 检查是否胜利
-      if (checkWinCondition()) {
-        winEvent();
-        lockClickEvents()
-      }
+
     }
   }
 
   /* M4.0 锁定事件  */
   function lockClickEvents() {
     clearInterval(timerInterval); // 停止计时器
+    const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
       cell.classList.add('lockclick');
     });
@@ -183,12 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function revealWrongFlags() {
+    const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {
       const row = parseInt(cell.dataset.row);
       const col = parseInt(cell.dataset.col);
       const position = `${row}-${col}`;
       if (!minePositions.includes(position) &&
         cell.classList.contains('flagged')) {
+        //console.log('wrong', position)
         cell.textContent = '❌'; // 显示错误标记
         cell.classList.remove('flagged')
         cell.classList.add('wrong-flag');
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // 检查是否胜利
           if (checkWinCondition()) {
             winEvent();
-            lockClickEvents()
+
           }
         }
       }
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkWinCondition() &&
       !isFirstClick) {
       winEvent();
-      lockClickEvents()
+
     }
   }
 
@@ -469,9 +469,8 @@ document.addEventListener('DOMContentLoaded', () => {
       revealUnflaggedMines();
       revealWrongFlags();
       revealAllCells();
+      lockClickEvents();
     });
-    lockClickEvents();
-    revealWrongFlags()
   }
 
 
