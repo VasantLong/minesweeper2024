@@ -27,7 +27,7 @@ body {
 }
 
 #modeButtons button {
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-weight: bold;
   margin: 0 10px;
   padding: 2.5px 15px;
@@ -42,7 +42,6 @@ body {
 #modeButtons button:hover {
   background-color: #0056b3;
 }
-
 
 #board {
   background-color: #ccc;
@@ -75,17 +74,17 @@ body {
 }
 
 @font-face {
-  font-family: 'DSEG7Modern';
-  src: url('DSEG7Modern-Bold.woff2') format('woff2'),
-    url('DSEG7Modern-Bold.woff') format('woff'),
-    url('DSEG7Modern-Bold.ttf') format('truetype');
+  font-family: "DSEG7Modern";
+  src: url("DSEG7Modern-Bold.woff2") format("woff2"),
+    url("DSEG7Modern-Bold.woff") format("woff"),
+    url("DSEG7Modern-Bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
 }
 
 #timer,
 #remainingMines {
-  font-family: 'DSEG7Modern', sans-serif;
+  font-family: "DSEG7Modern", sans-serif;
   font-size: 20px;
   color: white;
   background-color: #333;
@@ -103,15 +102,6 @@ body {
   /* 增加左右间距 */
   width: 70px;
   height: 25px;
-  padding: 2.5px 5px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#resetButton {
   padding: 5px 10px;
   background-color: #007bff;
   color: white;
@@ -163,7 +153,7 @@ body {
 
 .cell.revealed {
   background-color: #d0d0d0;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   box-shadow: none;
   /* 移除阴影，变为平面效果 */
   transform: translateY(0);
@@ -173,31 +163,24 @@ body {
 .cell.revealed[data-mine-count="1"] {
   color: blue;
 }
-
 .cell.revealed[data-mine-count="2"] {
   color: green;
 }
-
 .cell.revealed[data-mine-count="3"] {
   color: red;
 }
-
 .cell.revealed[data-mine-count="4"] {
   color: darkblue;
 }
-
 .cell.revealed[data-mine-count="5"] {
   color: darkred;
 }
-
 .cell.revealed[data-mine-count="6"] {
   color: teal;
 }
-
 .cell.revealed[data-mine-count="7"] {
   color: black;
 }
-
 .cell.revealed[data-mine-count="8"] {
   color: gray;
 }
@@ -207,25 +190,11 @@ body {
   pointer-events: none;
 }
 
-#winMessage {
-  display: none;
-  position: fixed;
-  top: 50%;
-  background-color: green;
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 24px;
-  z-index: 1000;
-}
-
+#winMessage,
 #loseMessage {
   display: none;
-  /* 初始隐藏 */
   position: fixed;
   top: 50%;
-  background-color: red;
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -233,6 +202,13 @@ body {
   font-size: 24px;
   z-index: 1000;
   /* 确保在最上层 */
+}
+
+#winMessage {
+  background-color: green;
+}
+#loseMessage {
+  background-color: red;
 }
 
 #loseMessage button.viewBoard {
