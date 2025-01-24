@@ -1,3 +1,13 @@
+:root {
+  --cellSize: 25px;
+  --cellGap: 1px;
+  --boardPadding: 9px;
+  --sweeperInfoHeight: 34px;
+  --buttonColor: #007bff;
+  --buttonHoverColor: #0056b3;
+  --TextColor: #fff;
+}
+
 html,
 body {
   height: 100%;
@@ -32,15 +42,15 @@ body {
   margin: 0 10px;
   padding: 2.5px 15px;
   font-size: 16px;
-  background-color: #007bff;
-  color: white;
+  background-color: var(--buttonColor);
+  color: var(--TextColor);
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 #modeButtons button:hover {
-  background-color: #0056b3;
+  background-color: var(--buttonHoverColor);
 }
 
 #board {
@@ -86,7 +96,7 @@ body {
 #remainingMines {
   font-family: "DSEG7Modern", sans-serif;
   font-size: 20px;
-  color: white;
+  color: var(--TextColor);
   background-color: #333;
   border-radius: 5px;
   border: 2px solid #666;
@@ -103,15 +113,15 @@ body {
   width: 70px;
   height: 25px;
   padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
+  background-color: var(--buttonColor);
+  color: var(--TextColor);
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
 #resetButton:hover {
-  background-color: #0056b3;
+  background-color: var(--buttonHoverColor);
 }
 
 #grid {
@@ -195,7 +205,7 @@ body {
   display: none;
   position: fixed;
   top: 50%;
-  color: white;
+  color: var(--TextColor);
   padding: 20px;
   border-radius: 10px;
   text-align: center;
@@ -216,7 +226,7 @@ body {
   padding: 10px 20px;
   font-size: 18px;
   cursor: pointer;
-  background-color: white;
+  background-color: var(--TextColor);
   color: red;
   border: none;
   border-radius: 5px;
@@ -224,4 +234,49 @@ body {
 
 #loseMessage button.viewBoard:hover {
   background-color: #ddd;
+}
+
+#tipsContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #f9f9f9;
+  border-top: 2px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+#toggleTipsButton {
+  background-color: var(--buttonColor);
+  color: var(--TextColor);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+#toggleTipsButton:hover {
+  background-color: var(--buttonHoverColor);
+}
+
+/* 操作提示内容样式 */
+#tipsContent {
+  display: none;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+#tipsContent h3 {
+  margin-top: 0;
+}
+#tipsContent ul {
+  margin: 0;
+  padding-left: 20px;
+}
+#tipsContent li {
+  margin-bottom: 5px;
 }

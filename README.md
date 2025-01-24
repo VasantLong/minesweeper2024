@@ -2,9 +2,9 @@
 
 #### 介绍 Description
 
-**Web单页应用开发实践项目**
+**Web 单页应用开发实践项目**
 
-项目目标：采用HTML、CSS和JavaScript开发“扫雷”游戏的单页面应用。
+项目目标：采用 HTML、CSS 和 JavaScript 开发“扫雷”游戏的单页面应用。
 [在线试玩](https://vasantlong.github.io/minesweeper2024/sweeper.html)
 
 #### 里程碑 Milestone
@@ -21,3 +21,8 @@
 10. 实现第一次不触雷：修改初始化逻辑
 11. 实现胜负显示样式优化
 12. 实现页面样式优化
+
+#### Some Action To Do
+
+1. 第一次左击页面无效+右击后左击判胜(与 milestone 10 相关) √
+2. 计时器超出 999 未停止(milestone 7)√

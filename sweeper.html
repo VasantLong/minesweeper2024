@@ -1,29 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>扫雷游戏</title>
+    <link rel="stylesheet" href="sweeperStyles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="sweeperScript.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>扫雷游戏</title>
-  <link rel="stylesheet" href="sweeperStyles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
-  <script src="sweeperScript.js"></script>
-</head>
-
-<body>
-  <div id="heading">
-    <b>Minesweeper</b>
-  </div>
-  <div id="modeButtons">
-    <button id="easyButton">Primary</button>
-    <button id="mediumButton">Medium</button>
-    <button id="hardButton">Expert</button>
-  </div>
-  <div id="board">
-    <div class="sweeperInfo pad"></div>
-    <table id="grid" class="pad"></table>
-  </div>
-
-</body>
-
+  <body>
+    <div id="heading">
+      <b>Minesweeper</b>
+    </div>
+    <div id="modeButtons">
+      <button id="easyButton">Primary</button>
+      <button id="mediumButton">Medium</button>
+      <button id="hardButton">Expert</button>
+    </div>
+    <div id="board">
+      <div class="sweeperInfo pad"></div>
+      <table id="grid" class="pad"></table>
+    </div>
+    <div id="tipsContainer">
+      <button id="toggleTipsButton">UNFOLD Tips</button>
+      <div id="tipsContent">
+        <h3>Tips:</h3>
+        <ul>
+          <li>
+            <strong>FirstClick</strong
+            >：仅第一次左键单击才进行计时，其余操作不影响。
+          </li>
+          <li><strong>左键单击</strong>：揭开单元格。</li>
+          <li><strong>右键单击</strong>：标记地雷（🚩）或疑问（❓）。</li>
+          <li><strong>双击</strong>：快速揭开周围未标记的单元格。</li>
+          <li><strong>重置按钮</strong>：重新开始游戏。</li>
+          <li><strong>难度切换</strong>：选择初级、中级或专家模式。</li>
+        </ul>
+      </div>
+    </div>
+  </body>
 </html>

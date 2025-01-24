@@ -1,48 +1,46 @@
-document.addEventListener('DOMContentLoaded', () => {
-
+document.addEventListener("DOMContentLoaded", () => {
   /* M0 难度配置(初始为简单) */
   const modeSettings = {
     easy: { gridRows: 9, gridCols: 9, mineNum: 10 },
     medium: { gridRows: 16, gridCols: 16, mineNum: 40 },
-    hard: { gridRows: 16, gridCols: 30, mineNum: 99 }
+    hard: { gridRows: 16, gridCols: 30, mineNum: 99 },
   };
 
-  let currentMode = 'easy';
-  let [gridRows, gridCols, mineNum] =
-    [modeSettings[currentMode].gridRows,
+  let currentMode = "easy";
+  let [gridRows, gridCols, mineNum] = [
+    modeSettings[currentMode].gridRows,
     modeSettings[currentMode].gridCols,
-    modeSettings[currentMode].mineNum];
+    modeSettings[currentMode].mineNum,
+  ];
   let remainingMines = mineNum;
   let isFirstClick = true; // 记录是否是第一次点击
 
   createBoard(gridRows, gridCols);
   let minePositions = []; // 初始为空
 
-  const cells = document.querySelectorAll('.cell');
-  cells.forEach(cell => {
-    cell.addEventListener('click',
-      () => handleCellClick(cell));
-    cell.addEventListener('contextmenu',
-      (event) => handleRightClick(event, cell));
-    cell.addEventListener('dblclick',
-      () => handleDoubleClick(cell, minePositions));
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach((cell) => {
+    cell.addEventListener("click", () => handleCellClick(cell));
+    cell.addEventListener("contextmenu", (event) =>
+      handleRightClick(event, cell)
+    );
+    cell.addEventListener("dblclick", () =>
+      handleDoubleClick(cell, minePositions)
+    );
   });
-
-
-
 
   /* M1 网格初步建立 */
   function createBoard(rows, cols) {
-    const grid = document.getElementById('grid');  // 显式获取元素
+    const grid = document.getElementById("grid"); // 显式获取元素
     for (let r = 0; r < rows; r++) {
-      let tr = document.createElement('tr');
+      let tr = document.createElement("tr");
       grid.appendChild(tr);
       for (let c = 0; c < cols; c++) {
-        let td = document.createElement('td');
-        td.style.padding = '0.5px';
+        let td = document.createElement("td");
+        td.style.padding = "0.5px";
         tr.appendChild(td);
-        let cell = document.createElement('div');
-        cell.className = 'cell';
+        let cell = document.createElement("div");
+        cell.className = "cell";
         cell.dataset.row = r;
         cell.dataset.col = c;
         td.append(cell);
@@ -50,14 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
   /* M2.1 随机生成不同位置的雷
      M2.2 放置雷 */
   function placeMines(minePositions) {
-    minePositions.forEach(position => {
-      const [mineRow, mineCol] = position.split('-');
+    minePositions.forEach((position) => {
+      const [mineRow, mineCol] = position.split("-");
       const cell = document.querySelector(
-        `.cell[data-row='${mineRow}'][data-col='${mineCol}']`);
+        `.cell[data-row='${mineRow}'][data-col='${mineCol}']`
+      );
       cell.dataset.mine = true; // 标记为雷
     });
   }
@@ -70,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (r === row && c === col) continue; // 跳过当前单元格
         if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
         const surroundingCell = document.querySelector(
-          `.cell[data-row='${r}'][data-col='${c}']`);
+          `.cell[data-row='${r}'][data-col='${c}']`
+        );
         if (surroundingCell.dataset.mine) {
           count++;
         }
@@ -84,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let r = 0; r < gridRows; r++) {
       for (let c = 0; c < gridCols; c++) {
         const cell = document.querySelector(
-          `.cell[data-row='${r}'][data-col='${c}']`);
+          `.cell[data-row='${r}'][data-col='${c}']`
+        );
         if (!cell.dataset.mine) {
           const mineCount = countSurroundingMines(r, c);
           if (mineCount >= 0) {
@@ -95,41 +95,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
   /* M4 左键单击事件 */
   function handleCellClick(cell) {
-    if (!isTimerRunning) {
-      // 如果计时器未运行，启动计时器
-      startTimer();
-      isTimerRunning = true;
-    }
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
     // 如果已经显示/被标记旗子，跳过
-    if (cell.classList.contains('revealed') ||
-      cell.classList.contains('flagged') ||
-      cell.classList.contains('question')) return;
+    if (
+      cell.classList.contains("revealed") ||
+      cell.classList.contains("flagged") ||
+      cell.classList.contains("question")
+    )
+      return;
 
-    if (isFirstClick) {
+    if (isFirstClick & !isTimerRunning) {
       // 如果是第一次点击，确保该单元格及其周围的单元格不包含地雷
-      minePositions = generateSafeMinePositions(row, col,
-        gridRows, gridCols, mineNum);
+      minePositions = generateSafeMinePositions(
+        row,
+        col,
+        gridRows,
+        gridCols,
+        mineNum
+      );
       placeMines(minePositions);
       placeCSM(gridRows, gridCols);
+      startTimer();
+      isTimerRunning = true; // 如果计时器未运行，启动计时器
       isFirstClick = false; // 标记为已经进行过第一次点击
+      handleCellClick(cell);
     } else {
-      if (cell.dataset.mine &&
-        !cell.classList.contains('flagged') &&
-        !cell.classList.contains('lockclick')) {
+      if (
+        cell.dataset.mine &&
+        !cell.classList.contains("flagged") &&
+        !cell.classList.contains("lockclick")
+      ) {
         // 如果点击的是雷，显示失败界面
         loseEvent();
-
       } else {
         // 如果点击的不是雷，显示周围的雷数
         const mineCount = cell.dataset.mineCount;
-        cell.textContent = mineCount > 0 ? mineCount : '';
-        cell.classList.add('revealed');
-        if (mineCount === '0') {
+        cell.textContent = mineCount > 0 ? mineCount : "";
+        cell.classList.add("revealed");
+        if (mineCount === "0") {
           // 如果周围没有雷，自动展开周围的空白区域
           revealEmptyCells(row, col);
         }
@@ -138,26 +144,24 @@ document.addEventListener('DOMContentLoaded', () => {
           winEvent();
         }
       }
-
-
     }
   }
 
   /* M4.0 锁定事件  */
   function lockClickEvents() {
     clearInterval(timerInterval); // 停止计时器
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
-      cell.classList.add('lockclick');
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach((cell) => {
+      cell.classList.add("lockclick");
     });
   }
 
   /* M4.0 胜利事件  */
-  const winMessage = document.createElement('div');
+  const winMessage = document.createElement("div");
   function winEvent() {
-    winMessage.textContent = 'You Win!';
-    winMessage.style.display = 'block';
-    winMessage.id = 'winMessage';
+    winMessage.textContent = "You Win!";
+    winMessage.style.display = "block";
+    winMessage.id = "winMessage";
     document.body.appendChild(winMessage);
     lockClickEvents();
   }
@@ -165,52 +169,56 @@ document.addEventListener('DOMContentLoaded', () => {
   /* M4.1 显示所有雷 */
   function revealUnflaggedMines() {
     if (minePositions.length === 0) {
-      console.warn('minePositions is empty. No mines to reveal.');
+      console.warn("minePositions is empty. No mines to reveal.");
       return;
     }
-    minePositions.forEach(position => {
-      const [row, col] = position.split('-');
+    minePositions.forEach((position) => {
+      const [row, col] = position.split("-");
       const cell = document.querySelector(
-        `.cell[data-row='${row}'][data-col='${col}']`);
+        `.cell[data-row='${row}'][data-col='${col}']`
+      );
 
-      if (!cell.classList.contains('flagged')) {
-        cell.textContent = '💣';
-        cell.classList.add('mine');
+      if (!cell.classList.contains("flagged")) {
+        cell.textContent = "💣";
+        cell.classList.add("mine");
       }
     });
   }
 
   function revealWrongFlags() {
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach((cell) => {
       const row = parseInt(cell.dataset.row);
       const col = parseInt(cell.dataset.col);
       const position = `${row}-${col}`;
-      if (!minePositions.includes(position) &&
-        cell.classList.contains('flagged')) {
+      if (
+        !minePositions.includes(position) &&
+        cell.classList.contains("flagged")
+      ) {
         //console.log('wrong', position)
-        cell.textContent = '❌'; // 显示错误标记
-        cell.classList.remove('flagged')
-        cell.classList.add('wrong-flag');
+        cell.textContent = "❌"; // 显示错误标记
+        cell.classList.remove("flagged");
+        cell.classList.add("wrong-flag");
       }
-    })
-
+    });
   }
 
   /* M4.2 自动展开空白区域 */
   function revealEmptyCells(row, col) {
     for (let r = row - 1; r <= row + 1; r++) {
       for (let c = col - 1; c <= col + 1; c++) {
-        if (r < 0 || r >= gridRows ||
-          c < 0 || c >= gridCols) continue; // 跳过越界的单元格
+        if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue; // 跳过越界的单元格
 
         const cell = document.querySelector(
-          `.cell[data-row='${r}'][data-col='${c}']`);
-        if (!cell.classList.contains('revealed') &&
+          `.cell[data-row='${r}'][data-col='${c}']`
+        );
+        if (
+          !cell.classList.contains("revealed") &&
           !cell.dataset.mine &&
-          !cell.classList.contains('flagged')) {
-          cell.classList.add('revealed');
-          if (cell.dataset.mineCount === '0') {
+          !cell.classList.contains("flagged")
+        ) {
+          cell.classList.add("revealed");
+          if (cell.dataset.mineCount === "0") {
             revealEmptyCells(r, c);
           } else {
             cell.textContent = cell.dataset.mineCount;
@@ -218,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
           // 检查是否胜利
           if (checkWinCondition()) {
             winEvent();
-
           }
         }
       }
@@ -227,39 +234,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* M5 右键单击事件 */
   function handleRightClick(event, cell) {
-    if (!isTimerRunning) {
-      // 如果计时器未运行，启动计时器
-      startTimer();
-      isTimerRunning = true;
-    }
     event.preventDefault(); // 阻止默认的右键菜单
-    if (cell.classList.contains('revealed')) return; // 如果已经显示，跳过
+    if (isFirstClick) return; // 如果是第一次点击，禁止右键标记
+    if (cell.classList.contains("revealed")) return; // 如果已经显示，跳过
 
     // 状态切换逻辑：旗子 🚩 -> 问号 ❓︎ -> 取消标记 -> 旗子 🚩
-    if (cell.textContent === '🚩') {
-      cell.textContent = '❓︎';
-      cell.classList.remove('flagged');
-      cell.classList.add('question');
+    if (cell.textContent === "🚩") {
+      cell.textContent = "❓︎";
+      cell.classList.remove("flagged");
+      cell.classList.add("question");
       remainingMines = Math.min(remainingMines + 1, mineNum); // 增加剩余雷数
-    } else if (cell.textContent === '❓︎') {
-      cell.textContent = '';
-      cell.classList.remove('question');
-    } else if (cell.textContent === '') {
+    } else if (cell.textContent === "❓︎") {
+      cell.textContent = "";
+      cell.classList.remove("question");
+    } else if (cell.textContent === "") {
       // 旗子数量如果已经达到或超过 mineNum，禁止标记
-      const flaggedCells = document.querySelectorAll('.cell.flagged');
+      const flaggedCells = document.querySelectorAll(".cell.flagged");
       if (flaggedCells.length >= mineNum) return;
-      cell.textContent = '🚩';
-      cell.classList.add('flagged');
+      cell.textContent = "🚩";
+      cell.classList.add("flagged");
       remainingMines = Math.max(remainingMines - 1, 0); // 减少剩余雷数
     }
 
     // 更新剩余雷数的显示
     remainingMinesDisplay.textContent = formatNumber(remainingMines);
     // 检查是否胜利
-    if (checkWinCondition() &&
-      !isFirstClick) {
+    if (checkWinCondition() && !isFirstClick) {
       winEvent();
-
     }
   }
 
@@ -268,26 +269,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const row = parseInt(cell.dataset.row);
     const col = parseInt(cell.dataset.col);
 
-    if (cell.classList.contains('flagged')) return;
-    if (cell.classList.contains('revealed') &&
-      cell.dataset.mineCount) {
+    if (cell.classList.contains("flagged")) return;
+    if (cell.classList.contains("revealed") && cell.dataset.mineCount) {
       // 获取周围的单元格
-      if (cell.dataset.mineCount !== '0') {
+      if (cell.dataset.mineCount !== "0") {
         const surroundingCells = getSurroundingCells(row, col);
         // 检查周围标记的旗子数量是否与实际雷数匹配
-        const flaggedCount = surroundingCells.filter(cell =>
-          cell.classList.contains('flagged')).length;
+        const flaggedCount = surroundingCells.filter((cell) =>
+          cell.classList.contains("flagged")
+        ).length;
         const mineCount = parseInt(cell.dataset.mineCount);
         if (flaggedCount === mineCount) {
           // 如果标记的旗子数量与实际雷数匹配，清除周围未标记的单元格
-          surroundingCells.forEach(cell => {
-            if (!cell.classList.contains('flagged') &&
-              !cell.classList.contains('revealed')) {
+          surroundingCells.forEach((cell) => {
+            if (
+              !cell.classList.contains("flagged") &&
+              !cell.classList.contains("revealed")
+            ) {
               handleCellClick(cell); // 调用左键单击处理函数
             }
           });
         }
-
       }
     }
   }
@@ -297,36 +299,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const surroundingCells = [];
     for (let r = row - 1; r <= row + 1; r++) {
       for (let c = col - 1; c <= col + 1; c++) {
-        if (r < 0 || r >= gridRows ||
-          c < 0 || c >= gridCols) continue;
+        if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) continue;
         const cell = document.querySelector(
-          `.cell[data-row='${r}'][data-col='${c}']`);
+          `.cell[data-row='${r}'][data-col='${c}']`
+        );
         surroundingCells.push(cell);
       }
     }
     return surroundingCells;
   }
 
-
-
   /* M7 游戏面板*/
   /* M7.1 创建显示未标记雷数的元素 */
-  const remainingMinesDisplay = document.createElement('div');
-  remainingMinesDisplay.id = 'remainingMines';
+  const remainingMinesDisplay = document.createElement("div");
+  remainingMinesDisplay.id = "remainingMines";
   remainingMinesDisplay.textContent = formatNumber(remainingMines);
-  document.querySelector('.sweeperInfo').appendChild(remainingMinesDisplay);
+  document.querySelector(".sweeperInfo").appendChild(remainingMinesDisplay);
   /* M7.2 创建重置按钮 */
-  const resetButton = document.createElement('button');
-  resetButton.id = 'resetButton';
-  resetButton.textContent = 'RESET';
-  document.querySelector('.sweeperInfo').appendChild(resetButton);
+  const resetButton = document.createElement("button");
+  resetButton.id = "resetButton";
+  resetButton.textContent = "RESET";
+  document.querySelector(".sweeperInfo").appendChild(resetButton);
   // 添加重置按钮的点击事件
-  resetButton.addEventListener('click', resetGame);
+  resetButton.addEventListener("click", resetGame);
 
   /* M7.2重置游戏 */
   function resetGame() {
     // 重置网格
-    grid.innerHTML = '';
+    grid.innerHTML = "";
     createBoard(gridRows, gridCols);
 
     // 重置雷、剩余雷数
@@ -338,24 +338,25 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(timerInterval);
     startTime = null;
     isTimerRunning = false;
-    timerDisplay.textContent = '000';
+    timerDisplay.textContent = "000";
 
     // 重置第一次点击标志
     isFirstClick = true;
 
     // 隐藏失败界面
-    loseMessage.style.display = 'none';
-    winMessage.style.display = 'none';
+    loseMessage.style.display = "none";
+    winMessage.style.display = "none";
 
     // 重新绑定事件监听器
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
-      cell.addEventListener('click',
-        () => handleCellClick(cell));
-      cell.addEventListener('contextmenu',
-        (event) => handleRightClick(event, cell));
-      cell.addEventListener('dblclick',
-        () => handleDoubleClick(cell, minePositions));
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach((cell) => {
+      cell.addEventListener("click", () => handleCellClick(cell));
+      cell.addEventListener("contextmenu", (event) =>
+        handleRightClick(event, cell)
+      );
+      cell.addEventListener("dblclick", () =>
+        handleDoubleClick(cell, minePositions)
+      );
     });
   }
 
@@ -365,17 +366,23 @@ document.addEventListener('DOMContentLoaded', () => {
   let isTimerRunning = false; // 标记计时器是否正在运行
 
   // 创建计时器显示元素
-  const timerDisplay = document.createElement('div');
-  timerDisplay.id = 'timer';
-  timerDisplay.textContent = '000';
-  document.querySelector('.sweeperInfo').appendChild(timerDisplay);
+  const timerDisplay = document.createElement("div");
+  timerDisplay.id = "timer";
+  timerDisplay.textContent = "000";
+  document.querySelector(".sweeperInfo").appendChild(timerDisplay);
 
   // 启动计时器
   function startTimer() {
     startTime = Date.now(); // 记录游戏开始时间
     timerInterval = setInterval(() => {
       const currentTime = Math.floor((Date.now() - startTime) / 1000);
-      timerDisplay.textContent = formatNumber(currentTime);
+      if (currentTime >= 999) {
+        clearInterval(timerInterval); // 停止计时器
+        timerDisplay.textContent = "999"; // 设置计时器显示为999
+        isTimerRunning = false; // 标记计时器为停止状态
+      } else {
+        timerDisplay.textContent = formatNumber(currentTime);
+      }
     }, 1000);
   }
 
@@ -383,18 +390,18 @@ document.addEventListener('DOMContentLoaded', () => {
       1.全部雷被标记为旗子
       2.非雷单元格全部被揭开*/
   function checkWinCondition() {
-    const cells = document.querySelectorAll('.cell');
+    const cells = document.querySelectorAll(".cell");
     let allNonMineCellsRevealed = true;
     let allMinesFlagged = true;
 
-    cells.forEach(cell => {
-      if (cell.dataset.mine === 'true') {
-        if (!cell.classList.contains('flagged')) {
+    cells.forEach((cell) => {
+      if (cell.dataset.mine === "true") {
+        if (!cell.classList.contains("flagged")) {
           allMinesFlagged = false;
         }
       } else {
         // 如果单元格不是雷，并且没有被揭开，则未胜利
-        if (!cell.classList.contains('revealed')) {
+        if (!cell.classList.contains("revealed")) {
           allNonMineCellsRevealed = false;
         }
       }
@@ -403,29 +410,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* M9 难度切换 */
-  const easyButton = document.getElementById('easyButton');
-  const mediumButton = document.getElementById('mediumButton');
-  const hardButton = document.getElementById('hardButton');
-  easyButton.addEventListener('click',
-    () => setMode('easy'));
-  mediumButton.addEventListener('click',
-    () => setMode('medium'));
-  hardButton.addEventListener('click',
-    () => setMode('hard'));
+  const easyButton = document.getElementById("easyButton");
+  const mediumButton = document.getElementById("mediumButton");
+  const hardButton = document.getElementById("hardButton");
+  easyButton.addEventListener("click", () => setMode("easy"));
+  mediumButton.addEventListener("click", () => setMode("medium"));
+  hardButton.addEventListener("click", () => setMode("hard"));
 
   /* M9.1 设置难度 */
   function setMode(mode) {
     currentMode = mode;
-    [gridRows, gridCols, mineNum] =
-      [modeSettings[currentMode].gridRows,
+    [gridRows, gridCols, mineNum] = [
+      modeSettings[currentMode].gridRows,
       modeSettings[currentMode].gridCols,
-      modeSettings[currentMode].mineNum];
+      modeSettings[currentMode].mineNum,
+    ];
     resetGame();
   }
 
   /* M10 第一次点击不触雷*/
-  function generateSafeMinePositions
-    (clickedRow, clickedCol, gridRows, gridCols, mineNum) {
+  function generateSafeMinePositions(
+    clickedRow,
+    clickedCol,
+    gridRows,
+    gridCols,
+    mineNum
+  ) {
     const safePositions = [];
     // 将第一次点击的单元格及其周围的单元格标记为安全区域
     for (let r = clickedRow - 1; r <= clickedRow + 1; r++) {
@@ -441,8 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const row = Math.floor(Math.random() * gridRows);
       const col = Math.floor(Math.random() * gridCols);
       const position = `${row}-${col}`;
-      if (!minePositions.includes(position) &&
-        !safePositions.includes(position)) {
+      if (
+        !minePositions.includes(position) &&
+        !safePositions.includes(position)
+      ) {
         minePositions.push(position);
       }
     }
@@ -450,22 +462,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return minePositions;
   }
 
-
-
   /* M11 失败事件  */
-  const loseMessage = document.createElement('div');
-  const viewBoardButton = document.createElement('button');
+  const loseMessage = document.createElement("div");
+  const viewBoardButton = document.createElement("button");
   function loseEvent() {
-    loseMessage.id = 'loseMessage';
-    loseMessage.textContent = 'Game Over!';
-    loseMessage.style.display = 'block';
+    loseMessage.id = "loseMessage";
+    loseMessage.textContent = "Game Over!";
+    loseMessage.style.display = "block";
     document.body.appendChild(loseMessage);
-    viewBoardButton.textContent = 'View Board';
-    viewBoardButton.className = 'viewBoard';
+    viewBoardButton.textContent = "View Board";
+    viewBoardButton.className = "viewBoard";
     loseMessage.appendChild(viewBoardButton);
 
-    viewBoardButton.addEventListener('click', () => {
-      loseMessage.style.display = 'none';
+    viewBoardButton.addEventListener("click", () => {
+      loseMessage.style.display = "none";
       revealUnflaggedMines();
       revealWrongFlags();
       revealAllCells();
@@ -473,19 +483,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
   /* M11.1 显示所有单元格状态 */
   function revealAllCells() {
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach((cell) => {
       const mineCount = parseInt(cell.dataset.mineCount);
-      if (cell.classList.contains('revealed') ||
-        cell.classList.contains('mine') ||
-        cell.classList.contains('flagged') ||
-        cell.classList.contains('wrong-flag')) return;
+      if (
+        cell.classList.contains("revealed") ||
+        cell.classList.contains("mine") ||
+        cell.classList.contains("flagged") ||
+        cell.classList.contains("wrong-flag")
+      )
+        return;
       else {
-        cell.textContent = mineCount > 0 ? mineCount : '';
-        cell.classList.add('revealed');
+        cell.textContent = mineCount > 0 ? mineCount : "";
+        cell.classList.add("revealed");
       }
     });
   }
@@ -493,9 +505,25 @@ document.addEventListener('DOMContentLoaded', () => {
   /* M12 优化界面*/
   /* M12.1 数字格式化*/
   function formatNumber(num) {
-    return num.toString().padStart(3, '0');
+    return num.toString().padStart(3, "0");
   }
 
+  /* M12.2 操作提示*/
+  // 获取操作提示按钮和内容
+  const toggleTipsButton = document.getElementById("toggleTipsButton");
+  const tipsContent = document.getElementById("tipsContent");
 
-
-})
+  // 添加点击事件，切换操作提示的显示和隐藏
+  toggleTipsButton.addEventListener("click", () => {
+    if (
+      tipsContent.style.display === "none" ||
+      tipsContent.style.display === ""
+    ) {
+      tipsContent.style.display = "block";
+      toggleTipsButton.textContent = "FOLD Tips";
+    } else {
+      tipsContent.style.display = "none";
+      toggleTipsButton.textContent = "UNFOLD Tips";
+    }
+  });
+});
