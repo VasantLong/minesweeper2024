@@ -513,6 +513,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleTipsButton = document.getElementById("toggleTipsButton");
   const tipsContent = document.getElementById("tipsContent");
 
+  // 从 localStorage 中读取状态
+  const isTipsVisible = localStorage.getItem("tipsVisible") === "true";
+
+  // 根据状态设置初始显示
+  if (isTipsVisible) {
+    tipsContent.style.display = "block";
+    toggleTipsButton.textContent = "FOLD Tips";
+  } else {
+    tipsContent.style.display = "none";
+    toggleTipsButton.textContent = "UNFOLD Tips";
+  }
+
   // 添加点击事件，切换操作提示的显示和隐藏
   toggleTipsButton.addEventListener("click", () => {
     if (
@@ -521,9 +533,11 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
       tipsContent.style.display = "block";
       toggleTipsButton.textContent = "FOLD Tips";
+      localStorage.setItem("tipsVisible", "true"); // 保存状态
     } else {
       tipsContent.style.display = "none";
       toggleTipsButton.textContent = "UNFOLD Tips";
+      localStorage.setItem("tipsVisible", "false"); // 保存状态
     }
   });
 });

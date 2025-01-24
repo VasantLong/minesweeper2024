@@ -25,4 +25,5 @@
 #### Some Action To Do
 
 1. 第一次左击页面无效+右击后左击判胜(与 milestone 10 相关) √
-2. 计时器超出 999 未停止(milestone 7)√
+2. 计时器超出 999 未停止(milestone 7) √
+3. maybe 游戏记录
